@@ -1,4 +1,4 @@
-# python lib/cli.py - Idea Capture Tool
+# Spark - Idea Capture Tool
 
 A lightweight command-line tool for developers to quickly capture and organize coding ideas without leaving the terminal.
 

@@ -77,7 +77,7 @@ Create virtual environment:
 ```
 python -m venv .venv or pipenv install
 source .venv/bin/activate or pipenv shell
-```
+````
 ## License
 
 MIT License

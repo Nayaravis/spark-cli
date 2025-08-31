@@ -146,3 +146,93 @@ def delete_collection(session, collection_id):
     except Exception as e:
         session.rollback()
         raise e
+
+# helpers.py (add these functions)
+def get_context_by_working_dir(session, working_dir):
+    try:
+        return session.query(Context).where(Context.working_directory == working_dir).first()
+    except Exception as e:
+        raise e
+
+def get_all_contexts(session):
+    try:
+        return session.query(Context).all()
+    except Exception as e:
+        raise e
+
+def get_sparks_by_context(session, context_id):
+    try:
+        return session.query(Spark).where(Spark.context_id == context_id).all()
+    except Exception as e:
+        raise e
+
+def get_sparks_by_collection(session, collection_id):
+    try:
+        collection = get_collection_by_id(session, collection_id)
+        if collection:
+            return collection.sparks
+        return []
+    except Exception as e:
+        raise e
+
+def get_sparks_from_today(session, context_id):
+    try:
+        from datetime import datetime, date
+        today = date.today()
+        return session.query(Spark).where(
+            Spark.context_id == context_id,
+            func.date(Spark.created_at) == today
+        ).all()
+    except Exception as e:
+        raise e
+
+def search_sparks(session, context_id, search_term):
+    try:
+        return session.query(Spark).where(
+            Spark.context_id == context_id,
+            Spark.content.ilike(f"%{search_term}%")
+        ).all()
+    except Exception as e:
+        raise e
+
+def get_all_collections(session):
+    try:
+        return session.query(Collection).all()
+    except Exception as e:
+        raise e
+
+def get_collection_by_name(session, name):
+    try:
+        return session.query(Collection).where(Collection.name == name).first()
+    except Exception as e:
+        raise e
+
+def add_spark_to_collection(session, spark_id, collection_id):
+    try:
+        spark = get_spark_by_id(session, spark_id)
+        collection = get_collection_by_id(session, collection_id)
+        
+        if spark and collection:
+            if collection not in spark.collections:
+                spark.collections.append(collection)
+                session.commit()
+            return spark
+        return None
+    except Exception as e:
+        session.rollback()
+        raise e
+
+def remove_spark_from_collection(session, spark_id, collection_id):
+    try:
+        spark = get_spark_by_id(session, spark_id)
+        collection = get_collection_by_id(session, collection_id)
+        
+        if spark and collection:
+            if collection in spark.collections:
+                spark.collections.remove(collection)
+                session.commit()
+            return spark
+        return None
+    except Exception as e:
+        session.rollback()
+        raise e
